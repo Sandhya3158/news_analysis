@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📰 NewsMind - Feedback System</title>
+</head>
+<body>
+    <h1>📰 NewsMind - Feedback System</h1>
+
+    <!-- Language Dropdown -->
+    <form method="get" action="/" style="margin-bottom: 20px;">
+        <label for="language">🌐 Select Language:</label>
+        <select name="language" id="language" onchange="this.form.submit()">
+            <option value="en" {% if language == 'en' %}selected{% endif %}>English</option>
+            <option value="hi" {% if language == 'hi' %}selected{% endif %}>Hindi</option>
+            <option value="te" {% if language == 'te' %}selected{% endif %}>Telugu</option>
+            <option value="ta" {% if language == 'ta' %}selected{% endif %}>Tamil</option>
+            <option value="bn" {% if language == 'bn' %}selected{% endif %}>Bengali</option>
+        </select>
+        <a href="/refresh" class="refresh-btn">🔄 Refresh News</a>
+    </form>
+
+    <!-- Search Bar -->
+    <div style="text-align: center; margin: 20px;">
+        <input type="text" id="searchInput" placeholder="Search by headline or category..." onkeyup="filterNews()" style="padding: 8px; width: 300px;">
+    </div>
+
+    <hr>
+
+    <!-- News Cards -->
+    <div class="row" id="newsContainer">
+        {% for row in headlines %}
+        <div class="news-card">
+            <!-- News Image -->
+            {% if row['Image URL'] and row['Image URL'] != '' %}
+                <img src="{{ row['Image URL'] }}" alt="News Image" class="news-image">
+            {% else %}
+                <img src="https://via.placeholder.com/300x150.png?text=No+Image" alt="No Image" class="news-image">
+            {% endif %}
+
+            <!-- News Text -->
+            <div class="news-details">
+                <h2 class="headline">{{ row['Translated_Headline'] }}</h2>
+
+                <!-- Category and Sentiment on Separate Lines -->
+                <p><strong>Category:</strong> {{ row['Category'] }}</p>
+                <p><strong>Sentiment:</strong> {{ row['Sentiment'] }}</p>
+
+                <!-- Read More Button -->
+                <a href="{{ row['URL'] }}" target="_blank" class="read-more-btn">📖 Read More</a>
+
+                <!-- Feedback Form -->
+                <form action="/submit" method="post">
+                    <input type="hidden" name="headline" value="{{ row['Headline'] }}">
+                    <input type="hidden" name="category" value="{{ row['Category'] }}">
+                    <input type="hidden" name="sentiment" value="{{ row['Sentiment'] }}">
+                    <label>Feedback:</label>
+                    <input type="text" name="feedback" required>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Search Script -->
+    <script>
+        function filterNews() {
+            var input = document.getElementById('searchInput').value.toLowerCase();
+            var cards = document.getElementsByClassName('news-card');
+
+            for (var i = 0; i < cards.length; i++) {
+                var headline = cards[i].getElementsByClassName('headline')[0].innerText.toLowerCase();
+                var category = cards[i].innerText.toLowerCase();
+                if (headline.includes(input) || category.includes(input)) {
+                    cards[i].style.display = "";
+                } else {
+                    cards[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+
+<!-- CSS Styling -->
+<style>
+    h1:hover {
+        color: rgb(8, 187, 233);
+    }
+
+    .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 15px;
+        padding: 10px;
+    }
+
+    .news-card {
+        border: 1px solid #ddd;
+        padding: 12px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .news-image {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        border-radius: 6px;
+    }
+
+    .news-details {
+        margin-top: 10px;
+    }
+
+    .headline {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin: 8px 0;
+    }
+
+    .read-more-btn {
+        display: inline-block;
+        margin-top: 6px;
+        padding: 6px 12px;
+        background-color: #007BFF;
+        color: white;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .read-more-btn:hover {
+        background-color: #0056b3;
+    }
+
+    form {
+        margin-top: 8px;
+    }
+
+    input[type="text"] {
+        padding: 6px;
+        width: calc(100% - 16px);
+        margin-top: 4px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        padding: 6px 12px;
+        background-color: #28a745;
+        color: white;
+        border-radius: 4px;
+        border: none;
+        font-size: 0.9rem;
+    }
+
+    button:hover {
+        background-color: #218838;
+    }
+
+    .refresh-btn {
+        display: inline-block;
+        margin-left: 20px;
+        padding: 8px 12px;
+        background-color: #17a2b8;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+        text-decoration: none;
+        box-shadow: 3px 3px 12px rgba(11, 255, 2, 0.6);
+    }
+
+    .refresh-btn:hover {
+        background-color: #f19a37;
+        transform: translateX(10px);
+        transition: transform 0.6s ease-in-out;
+    }
+</style>
+</html>

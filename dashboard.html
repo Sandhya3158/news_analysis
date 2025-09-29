@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Sentiment Analysis Dashboard</h1>
+
+    <!-- Bar chart to display sentiment counts -->
+    <canvas id="sentimentChart" width="400" height="200"></canvas>
+
+    <script>
+        // Data for the chart (sentiment labels and count values)
+        var sentimentLabels = {{ sentiments | tojson }};
+        var sentimentCounts = {{ counts | tojson }};
+        
+        // Create the chart
+        var ctx = document.getElementById('sentimentChart').getContext('2d');
+        var sentimentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sentimentLabels,
+                datasets: [{
+                    label: 'Sentiment Count',
+                    data: sentimentCounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+
+    <!-- Option to download the CSV file -->
+    <a href="{{ url_for('download_csv') }}" class="btn btn-primary">Download Data as CSV</a>
+
+    <h2>Feedback Summary</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Headline</th>
+                <th>Category</th>
+                <th>Sentiment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in grouped_data.values %}
+                <tr>
+                    <td>{{ row['Headline'] }}</td>
+                    <td>{{ row['Category'] }}</td>
+                    <td>{{ row['Sentiment'] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</body>
+</html>
